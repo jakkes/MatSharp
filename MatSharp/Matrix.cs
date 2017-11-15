@@ -31,6 +31,24 @@ namespace MatSharp
                 _matrix[i][j] = value;
             }
         }
+        public Matrix Rref{
+            get{
+                var mat = Clone();
+                
+                for(int i = 0; i < mat.Columns; i++){
+                    for(int j = 0; j < mat.Rows; j++){
+                        
+                    }
+
+                    for(int j = 0; j < mat.Rows; j++){
+
+                    }
+                }
+
+                return mat;
+            }
+        }
+
         private double[][] _matrix;
 
         private Matrix(){ }
@@ -39,6 +57,7 @@ namespace MatSharp
             for (int i = 0; i < cols; i++)
                 _matrix[i] = new double[cols];
         }
+        public Matrix Clone() => SubMatrix(Enumerable.Range(0,Columns), Enumerable.Range(0, Rows));
         public Matrix SubMatrix(IEnumerable<int> cols, IEnumerable<int> rows){
             int colCount = cols.Count();
             int rowCount = rows.Count();
@@ -65,6 +84,22 @@ namespace MatSharp
 
             }
             return str;
+        }
+        private void InterchangeRows(int row1, int row2){
+            for(int i = 0; i < Columns; i++){
+                double temp = this[row1,i];
+                this[row1,i] = this[row2,i];
+                this[row2,i] = temp;
+            }
+        }
+        private void MultiplyRow(int row, double multiplier){
+            for(int i = 0; i < Columns; i++)
+                this[row,i] *= multiplier;
+        }
+        private void AddRow(int row, int to) => AddRow(row, to, 1);
+        private void AddRow(int row, int to, double multiplier){
+            for(int i = 0; i < Columns; i++)
+                this[to,i] += multiplier * this[row,i];
         }
         public static double Det(Matrix a) => Det(a, Enumerable.Range(0, a.Columns), Enumerable.Range(0, a.Rows));
         private static double Det(Matrix a, IEnumerable<int> cols, IEnumerable<int> rows){
