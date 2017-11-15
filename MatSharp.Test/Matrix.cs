@@ -21,5 +21,14 @@ namespace MatSharp.Test
             Matrix a = Matrix.Parse("1 2;3 4");
             
         }
+
+        [Fact]
+        public void Determinant(){
+            Matrix mat = Matrix.Parse("1 2;3 4");
+            Assert.Equal(-2,mat.Determinant);
+
+            Matrix mat2 = Matrix.Parse("1 0 3 7;2 5 4 2;1 3 4 1;1 1 1 4");
+            Assert.Equal(3, mat2.Determinant);
+        }
     }
 }

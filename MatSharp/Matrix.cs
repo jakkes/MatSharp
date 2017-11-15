@@ -53,7 +53,7 @@ namespace MatSharp
                 double det = 0;
 
                 foreach(var col in cols)
-                    det += Det(a, cols.Where(x => x != col), rows.Skip(1)) * a[col,rows.First()];
+                    det += Det(a, cols.Where(x => x != col), rows.Skip(1)) * a[col,rows.First()] * Math.Pow(-1,col);
 
                 return det;
             }
