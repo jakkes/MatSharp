@@ -39,7 +39,33 @@ namespace MatSharp
             for (int i = 0; i < cols; i++)
                 _matrix[i] = new double[cols];
         }
+        public Matrix SubMatrix(IEnumerable<int> cols, IEnumerable<int> rows){
+            int colCount = cols.Count();
+            int rowCount = rows.Count();
+            Matrix mat = new Matrix(colCount,rowCount);
+            int i = 0;
+            int j = 0;
+            foreach(var row in rows){
+                j = 0;
+                foreach(var col in cols){
+                    mat[i,j] = this[row,col];
+                    j++;
+                }
+                i++;
+            }
+            return mat;
+        }
+        public string toString(){
+            string str = "";
+            for(int i = 0; i < Rows; i++){
+                for(int j = 0; j < Columns; j++)
+                    str += this[i,j] + " ";
+                
+                str += "\n";
 
+            }
+            return str;
+        }
         public static double Det(Matrix a) => Det(a, Enumerable.Range(0, a.Columns), Enumerable.Range(0, a.Rows));
         private static double Det(Matrix a, IEnumerable<int> cols, IEnumerable<int> rows){
             int colCount = cols.Count();
@@ -47,14 +73,16 @@ namespace MatSharp
             if(colCount != rowCount)
                 throw new ArgumentException("Matrix does not have same number of rows as columns.");
             if(colCount == 1)
-                return a[cols.First(),rows.First()];
+                return a[rows.First(),cols.First()];
             else{
-                
                 double det = 0;
 
-                foreach(var col in cols)
-                    det += Det(a, cols.Where(x => x != col), rows.Skip(1)) * a[col,rows.First()] * Math.Pow(-1,col);
-
+                int colIndex = 0;
+                foreach(var col in cols){
+                    det += a[rows.First(),col] * Det(a, cols.Where(x => x != col), rows.Skip(1)) * (colIndex % 2 == 0 ? 1 : -1);
+                    colIndex++;
+                }
+                
                 return det;
             }
         }
@@ -157,5 +185,24 @@ namespace MatSharp
 
             return mat;
         }
+        public static  bool operator ==(Matrix a, Matrix b){
+            if(a.Rows != b.Rows || a.Columns != b.Columns)
+                return false;
+            for(int i = 0; i < a.Rows;i++)
+                for(int j = 0 ; j < a.Columns; j++)
+                    if(a[i,j] != b[i,j])
+                        return false;
+            
+            return true;
+        }
+        public static bool operator != (Matrix a, Matrix b) => !(a == b);
+
+        public override bool Equals(object obj){
+            if(obj is Matrix)
+                return this == (Matrix)obj;
+            return base.Equals(obj);
+        }
+
+        public override int GetHashCode() => base.GetHashCode();
     }
 }
