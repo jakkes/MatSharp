@@ -54,7 +54,7 @@ namespace MatSharp
         private Matrix(){ }
         public Matrix(int rows, int cols) {
             _matrix = new double[rows][];
-            for (int i = 0; i < cols; i++)
+            for (int i = 0; i < rows; i++)
                 _matrix[i] = new double[cols];
         }
         public Matrix Clone() => SubMatrix(Enumerable.Range(0,Columns), Enumerable.Range(0, Rows));
@@ -162,6 +162,18 @@ namespace MatSharp
 
             return mat;
         }
+        public static Matrix Identity(int size){
+            var mat = new Matrix(size,size);
+            for(int i = 0; i < size; i++){
+                for(int j = 0; j < size; j++){
+                    if(i == j)
+                        mat[i,j] = 1;
+                    else
+                        mat[i,j] = 0;
+                }
+            }
+            return mat;
+        }
         public static Matrix operator+(Matrix a, Matrix b){
             if(a.Rows != b.Rows || a.Columns != b.Columns)
                 throw new ArgumentException("Invalid matrix dimensions.");
@@ -207,6 +219,10 @@ namespace MatSharp
             return mat;
         }
         public static Matrix operator*(Matrix a, Matrix b){
+            
+            if(a.Columns != b.Rows)
+                throw new ArgumentException("Invalid matrix dimensions.");
+
             Matrix mat = new Matrix(b.Rows,b.Columns);
 
             for(int i = 0; i < mat.Rows; i++){
