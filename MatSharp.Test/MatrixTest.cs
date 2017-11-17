@@ -134,6 +134,14 @@ namespace MatSharp.Test
         }
 
         [Fact]
+        public void Transpose(){
+            Assert.Equal(
+                Matrix.Parse("1 2 3;4 5 6"),
+                Matrix.Parse("1 4;2 5;3 6").Transpose
+            );
+        }
+
+        [Fact]
         public void Solve(){
             Assert.Equal(
                 Matrix.Parse("1;1"),
@@ -150,7 +158,7 @@ namespace MatSharp.Test
 
             Assert.Equal(
                 x,
-                A.Solve(b)
+                MatrixMath.Round(A.Solve(b),2)
             );
         }
     }

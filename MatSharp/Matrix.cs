@@ -51,6 +51,19 @@ namespace MatSharp
             }
         }
         /// <summary>
+        ///     Returns the transposed matrix
+        /// </summary>
+        public Matrix Transpose {
+            get {
+                Matrix mat = new Matrix(Columns,Rows);
+                for(int i = 0; i < Rows; i++)
+                    for(int j = 0; j < Columns; j++)
+                        mat[j,i] = this[i,j];
+
+                return mat;
+            }
+        }
+        /// <summary>
         ///     Returns the reduced row echolon form
         /// </summary>
         public Matrix Rref
@@ -190,8 +203,38 @@ namespace MatSharp
                 throw new ArgumentException("Matrix dimensions do not agree");
 
             var mat = JoinColumns(this, b);
-            return mat.Rref.SubMatrix(0, Rows, Columns, b.Columns);
+
+            var rref = mat.Rref;
+
+            if(rref.leadingElements.Any(x => x > Columns - 1))
+                throw new NoSolutionException("System cannot be solved.");
+
+            return rref.SubMatrix(0, Rows, Columns, b.Columns);
         }
+        /// <summary>
+        ///     Returns the columns of the leading elements of each row. If there is no non-zero element, -1 is used
+        /// </summary>
+        private IEnumerable<int> leadingElements
+        {
+            get
+            {
+                int[] cols = new int[Rows];
+                for (int i = 0; i < Rows; i++)
+                {
+                    cols[i] = -1;
+                    for (int j = 0; j < Columns; j++)
+                    {
+                        if (this[i, j] != 0)
+                        {
+                            cols[i] = j;
+                            break;
+                        }
+                    }
+                }
+                return cols;
+            }
+        }
+
         public static Matrix JoinRows(Matrix a, Matrix b){
             if(a.Columns != b.Columns)
                 throw new ArgumentException("Matrix dimensions do not agree");
@@ -389,6 +432,21 @@ namespace MatSharp
             return true;
         }
         public static bool operator !=(Matrix a, Matrix b) => !(a == b);
+
+        public static bool operator <(Matrix a, Matrix b){
+            if(a.Rows != b.Rows || a.Columns != b.Columns)
+                throw new ArgumentException("Matrix dimensions do not agree.");
+
+            for(int i = 0; i < a.Rows; i++){
+                for(int j = 0; j < a.Columns; j++){
+                    if(a[i,j] > b[i,j])
+                        return false;
+                }
+            }
+
+            return true;
+        }
+        public static bool operator >(Matrix a, Matrix b) => b < a;
 
         public override bool Equals(object obj)
         {
