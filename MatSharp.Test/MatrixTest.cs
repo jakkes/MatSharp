@@ -110,5 +110,48 @@ namespace MatSharp.Test
                 Matrix.Parse("-1 2 -5 1 1 3;1 0 5 -1 1 3;1 0 5 1 -1 -3").Rref
             );
         }
+
+        [Fact]
+        public void JoinRows(){
+            Assert.Equal(
+                Matrix.Parse("1 2;3 4;5 6;7 8"),
+                Matrix.JoinRows(
+                    Matrix.Parse("1 2;3 4"),
+                    Matrix.Parse("5 6;7 8")
+                )
+            );
+        }
+
+        [Fact]
+        public void JoinColumns(){
+            Assert.Equal(
+                Matrix.Parse("1 2 3 4;5 6 7 8"),
+                Matrix.JoinColumns(
+                    Matrix.Parse("1 2;5 6"),
+                    Matrix.Parse("3 4;7 8")
+                )
+            );
+        }
+
+        [Fact]
+        public void Solve(){
+            Assert.Equal(
+                Matrix.Parse("1;1"),
+                Matrix.Parse("1 0;0 1").Solve(Matrix.Parse("1;1"))
+            );
+
+            var x = Matrix.Parse("2 1;1 2");
+            var A = Matrix.Parse("3 1;1 3");
+            var b = Matrix.Parse("7 5;5 7");
+
+            Assert.Equal(
+                b, A*x
+            );
+
+            Assert.Equal(
+                x,
+                A.Solve(b)
+            );
+        }
     }
 }

@@ -152,8 +152,7 @@ namespace MatSharp
         /// <summary>
         ///     Switches row1 and row2
         /// </summary>
-        private void InterchangeRows(int row1, int row2)
-        {
+        private void InterchangeRows(int row1, int row2){
             if(row1 == row2) return;
 
             for (int i = 0; i < Columns; i++)
@@ -178,14 +177,55 @@ namespace MatSharp
         /// <summary>
         ///     Adds a multiple of one row to another
         /// </summary>
-        private void AddRow(int row, int to, double multiplier)
-        {
+        private void AddRow(int row, int to, double multiplier){
             for (int i = 0; i < Columns; i++)
                 this[to, i] += multiplier * this[row, i];
         }
+        /// <summary>
+        ///     Solves the equation Ax = b, where A is the current object
+        /// </summary>
+        /// TODO: Fix this
+        public Matrix Solve(Matrix b){
+            if(Rows != b.Rows)
+                throw new ArgumentException("Matrix dimensions do not agree");
+
+            var mat = JoinColumns(this, b);
+            return mat.Rref.SubMatrix(0, Rows, Columns, b.Columns);
+        }
+        public static Matrix JoinRows(Matrix a, Matrix b){
+            if(a.Columns != b.Columns)
+                throw new ArgumentException("Matrix dimensions do not agree");
+
+            Matrix mat = new Matrix(a.Rows + b.Rows, a.Columns);
+
+            for(int i = 0; i < a.Rows; i++)
+                for(int j = 0; j < a.Columns; j++)
+                    mat[i,j] = a[i,j];
+                
+            for(int i = 0; i < b.Rows; i++)
+                for(int j = 0; j < b.Columns; j++)
+                    mat[a.Rows + i, j] = b[i ,j];
+
+            return mat;
+        }
+        public static Matrix JoinColumns(Matrix a, Matrix b){
+            if(a.Rows != b.Rows)
+                throw new ArgumentException("Matrix dimensions do not agree");
+
+            Matrix mat = new Matrix(a.Rows, a.Columns + b.Columns);
+
+            for(int i = 0; i < a.Rows; i++)
+                for(int j = 0; j < a.Columns; j++)
+                    mat[i,j] = a[i,j];
+                
+            for(int i = 0; i < b.Rows; i++)
+                for(int j = 0; j < b.Columns; j++)
+                    mat[i,a.Columns + j] = b[i ,j];
+
+            return mat;
+        }
         public static double Det(Matrix a) => Det(a, Enumerable.Range(0, a.Columns), Enumerable.Range(0, a.Rows));
-        private static double Det(Matrix a, IEnumerable<int> cols, IEnumerable<int> rows)
-        {
+        private static double Det(Matrix a, IEnumerable<int> cols, IEnumerable<int> rows){
             int colCount = cols.Count();
             int rowCount = rows.Count();
             if (colCount != rowCount)
@@ -207,8 +247,7 @@ namespace MatSharp
             }
         }
         public static Matrix Parse(string text) => Parse(text, ' ', ';');
-        public static Matrix Parse(string text, char colSep, char rowSep)
-        {
+        public static Matrix Parse(string text, char colSep, char rowSep){
 
             var rows = text.Split(rowSep);
 
