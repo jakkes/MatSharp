@@ -92,5 +92,23 @@ namespace MatSharp.Test
             Assert.Equal(mat3, mat * mat2);
             Assert.Throws<ArgumentException>(() => mat2 * mat);
         }
+
+        [Fact]
+        public void Rref(){
+            Assert.Equal(
+                Matrix.Identity(2), 
+                Matrix.Parse("1 1;-1 1").Rref
+            );
+
+            Assert.Equal(
+                Matrix.Parse("1 1;0 0"),
+                Matrix.Parse("1 1;1 1").Rref
+            );
+
+            Assert.Equal(
+                Matrix.Parse("1 0 5 0 0 0;0 1 0 0 1 3;0 0 0 1 -1 -3"),
+                Matrix.Parse("-1 2 -5 1 1 3;1 0 5 -1 1 3;1 0 5 1 -1 -3").Rref
+            );
+        }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Dynamic;
 using System.Linq;
+using System.Globalization;
 
 namespace MatSharp
 {
@@ -58,23 +59,40 @@ namespace MatSharp
             {
                 var mat = Clone();
 
-                for (int i = 0; i < mat.Columns; i++)
-                {
-                    for (int j = 0; j < mat.Rows; j++)
-                    {
+                int row = 0;
 
+                for(int i = 0; i < Columns; i++){
+                    
+                    bool oneFixed = false;
+
+                    for(int j = row; j < Rows; j++){
+                        if(mat[j,i] != 0){
+                            mat.InterchangeRows(row,j);
+                            oneFixed = true;
+                            break;
+                        }
                     }
 
-                    for (int j = 0; j < mat.Rows; j++)
-                    {
+                    if(!oneFixed) continue;
 
+                    mat.MultiplyRow(row,1 / mat[row,i]);
+
+                    for(int j = 0; j < Rows; j++){
+                        if(j == row)
+                            continue;
+                        if(mat[j,i] == 0)
+                            continue;
+                        
+                        mat.AddRow(row,j,-1 * mat[j,i]);
                     }
+
+                    row++;
                 }
 
                 return mat;
             }
         }
-
+        
         private double[][] _matrix;
 
         private Matrix() { }
@@ -100,12 +118,11 @@ namespace MatSharp
         {
             int colCount = cols.Count();
             int rowCount = rows.Count();
-            Matrix mat = new Matrix(colCount, rowCount);
+            Matrix mat = new Matrix(rowCount, colCount);
             int i = 0;
-            int j = 0;
             foreach (var row in rows)
             {
-                j = 0;
+                int j = 0;
                 foreach (var col in cols)
                 {
                     mat[i, j] = this[row, col];
@@ -132,8 +149,13 @@ namespace MatSharp
             }
             return str;
         }
+        /// <summary>
+        ///     Switches row1 and row2
+        /// </summary>
         private void InterchangeRows(int row1, int row2)
         {
+            if(row1 == row2) return;
+
             for (int i = 0; i < Columns; i++)
             {
                 double temp = this[row1, i];
@@ -141,12 +163,21 @@ namespace MatSharp
                 this[row2, i] = temp;
             }
         }
+        /// <summary>
+        ///     Replaces a row with a multiple of same row
+        /// </summary>
         private void MultiplyRow(int row, double multiplier)
         {
             for (int i = 0; i < Columns; i++)
                 this[row, i] *= multiplier;
         }
+        /// <summary>
+        ///     Adds one row to another
+        /// </summary>
         private void AddRow(int row, int to) => AddRow(row, to, 1);
+        /// <summary>
+        ///     Adds a multiple of one row to another
+        /// </summary>
         private void AddRow(int row, int to, double multiplier)
         {
             for (int i = 0; i < Columns; i++)
@@ -184,6 +215,8 @@ namespace MatSharp
             Matrix mat = new Matrix();
             mat._matrix = new double[rows.Length][];
 
+            var fmt = new NumberFormatInfo(){ NegativeSign = "-" };
+
             for (int i = 0; i < rows.Length; i++)
             {
                 var cols = rows[i].Split(colSep);
@@ -194,7 +227,7 @@ namespace MatSharp
                 mat._matrix[i] = new double[cols.Length];
 
                 for (int j = 0; j < cols.Length; j++)
-                    mat._matrix[i][j] = double.Parse(cols[j]);
+                    mat._matrix[i][j] = double.Parse(cols[j],fmt);
             }
 
             return mat;
