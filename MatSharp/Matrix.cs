@@ -8,6 +8,9 @@ namespace MatSharp
 {
     public class Matrix
     {
+        /// <summary>
+        ///     Number of rows
+        /// </summary>
         public int Rows
         {
             get
@@ -15,6 +18,9 @@ namespace MatSharp
                 return _matrix.Length;
             }
         }
+        /// <summary>
+        ///     Number of columns
+        /// </summary>
         public int Columns
         {
             get
@@ -22,6 +28,9 @@ namespace MatSharp
                 return _matrix.Length == 0 ? 0 : _matrix[0].Length;
             }
         }
+        /// <summary>
+        ///     Returns the determinant
+        /// </summary>
         public double Determinant
         {
             get
@@ -40,6 +49,9 @@ namespace MatSharp
                 _matrix[i][j] = value;
             }
         }
+        /// <summary>
+        ///     Returns the reduced row echolon form
+        /// </summary>
         public Matrix Rref
         {
             get
@@ -72,9 +84,18 @@ namespace MatSharp
             for (int i = 0; i < rows; i++)
                 _matrix[i] = new double[cols];
         }
+        /// <summary>
+        ///     Copies the matrix into a new reference
+        /// </summary>
         public Matrix Clone() => SubMatrix(Enumerable.Range(0, Rows), Enumerable.Range(0, Columns));
+        /// <summary>
+        ///     Returns a submatrix
+        /// </summary>
         public Matrix SubMatrix(int rowFrom, int rowCount, int colFrom, int colCount)
             => SubMatrix(Enumerable.Range(rowFrom, rowCount), Enumerable.Range(colFrom, colCount));
+        /// <summary>
+        ///     Returns a submatrix containing the rows and columns supplied.
+        /// </summary>
         public Matrix SubMatrix(IEnumerable<int> rows, IEnumerable<int> cols)
         {
             int colCount = cols.Count();
@@ -94,6 +115,10 @@ namespace MatSharp
             }
             return mat;
         }
+        /// <summary>
+        ///     Returns a printable version of the matrix
+        /// </summary>
+        /// TODO: Make it prettier
         public string toString()
         {
             string str = "";
