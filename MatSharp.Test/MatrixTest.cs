@@ -173,6 +173,7 @@ namespace MatSharp.Test
             Assert.Equal(4, a.ElementAt(4));
             Assert.Equal(6, a.ElementAt(5));
             Assert.Throws<ArgumentOutOfRangeException>(() => a.ElementAt(6));
+            
         }
     }
 }
