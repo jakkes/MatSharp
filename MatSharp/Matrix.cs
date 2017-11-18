@@ -7,28 +7,16 @@ using System.Globalization;
 
 namespace MatSharp
 {
-    public class Matrix
+    public class Matrix : SuperMatrix<double>
     {
-        /// <summary>
-        ///     Number of rows
-        /// </summary>
-        public int Rows
+        public Matrix(int rows, int cols) : base(rows, cols)
         {
-            get
-            {
-                return _matrix.Length;
-            }
         }
-        /// <summary>
-        ///     Number of columns
-        /// </summary>
-        public int Columns
+
+        public Matrix()
         {
-            get
-            {
-                return _matrix.Length == 0 ? 0 : _matrix[0].Length;
-            }
         }
+
         /// <summary>
         ///     Returns the determinant
         /// </summary>
@@ -39,30 +27,6 @@ namespace MatSharp
                 return Matrix.Det(this);
             }
         }
-        public double this[int i, int j]
-        {
-            get
-            {
-                return _matrix[i][j];
-            }
-            set
-            {
-                _matrix[i][j] = value;
-            }
-        }
-        /// <summary>
-        ///     Returns the transposed matrix
-        /// </summary>
-        public Matrix Transpose {
-            get {
-                Matrix mat = new Matrix(Columns,Rows);
-                for(int i = 0; i < Rows; i++)
-                    for(int j = 0; j < Columns; j++)
-                        mat[j,i] = this[i,j];
-
-                return mat;
-            }
-        }
         /// <summary>
         ///     Returns the reduced row echolon form
         /// </summary>
@@ -70,7 +34,7 @@ namespace MatSharp
         {
             get
             {
-                var mat = Clone();
+                var mat = (Matrix) Clone();
 
                 int row = 0;
 
@@ -105,29 +69,19 @@ namespace MatSharp
                 return mat;
             }
         }
-        
-        private double[][] _matrix;
-
-        private Matrix() { }
-        public Matrix(int rows, int cols)
-        {
-            _matrix = new double[rows][];
-            for (int i = 0; i < rows; i++)
-                _matrix[i] = new double[cols];
-        }
         /// <summary>
         ///     Copies the matrix into a new reference
         /// </summary>
-        public Matrix Clone() => SubMatrix(Enumerable.Range(0, Rows), Enumerable.Range(0, Columns));
+        public new Matrix Clone() => SubMatrix(Enumerable.Range(0, Rows), Enumerable.Range(0, Columns));
         /// <summary>
         ///     Returns a submatrix
         /// </summary>
-        public Matrix SubMatrix(int rowFrom, int rowCount, int colFrom, int colCount)
+        public new Matrix SubMatrix(int rowFrom, int rowCount, int colFrom, int colCount)
             => SubMatrix(Enumerable.Range(rowFrom, rowCount), Enumerable.Range(colFrom, colCount));
         /// <summary>
         ///     Returns a submatrix containing the rows and columns supplied.
         /// </summary>
-        public Matrix SubMatrix(IEnumerable<int> rows, IEnumerable<int> cols)
+        public new Matrix SubMatrix(IEnumerable<int> rows, IEnumerable<int> cols)
         {
             int colCount = cols.Count();
             int rowCount = rows.Count();
@@ -144,23 +98,6 @@ namespace MatSharp
                 i++;
             }
             return mat;
-        }
-        /// <summary>
-        ///     Returns a printable version of the matrix
-        /// </summary>
-        /// TODO: Make it prettier
-        public string toString()
-        {
-            string str = "";
-            for (int i = 0; i < Rows; i++)
-            {
-                for (int j = 0; j < Columns; j++)
-                    str += this[i, j] + " ";
-
-                str += "\n";
-
-            }
-            return str;
         }
         /// <summary>
         ///     Switches row1 and row2
@@ -209,7 +146,7 @@ namespace MatSharp
             if(rref.leadingElements.Any(x => x > Columns - 1))
                 throw new NoSolutionException("System cannot be solved.");
 
-            return rref.SubMatrix(0, Rows, Columns, b.Columns);
+            return (Matrix) rref.SubMatrix(0, Rows, Columns, b.Columns);
         }
         /// <summary>
         ///     Returns the columns of the leading elements of each row. If there is no non-zero element, -1 is used

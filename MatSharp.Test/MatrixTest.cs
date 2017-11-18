@@ -1,6 +1,7 @@
 using System;
 using Xunit;
 using MatSharp;
+using System.Linq;
 
 namespace MatSharp.Test
 {
@@ -160,6 +161,18 @@ namespace MatSharp.Test
                 x,
                 MatrixMath.Round(A.Solve(b),2)
             );
+        }
+
+        [Fact]
+        public void Enumerator(){
+            Matrix a = Matrix.Parse("1 2;3 4;5 6");
+            Assert.Equal(1, a.ElementAt(0));
+            Assert.Equal(3, a.ElementAt(1));
+            Assert.Equal(5, a.ElementAt(2));
+            Assert.Equal(2, a.ElementAt(3));
+            Assert.Equal(4, a.ElementAt(4));
+            Assert.Equal(6, a.ElementAt(5));
+            Assert.Throws<ArgumentOutOfRangeException>(() => a.ElementAt(6));
         }
     }
 }
