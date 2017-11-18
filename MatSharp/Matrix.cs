@@ -51,6 +51,28 @@ namespace MatSharp {
             }
         }
 
+        public Matrix<T> JoinColumns(Matrix<T> matrix){
+            if(Rows != matrix.Rows)
+                throw new ArgumentException("Matrix dimensions do not agree");
+            
+            return new Matrix<T>(this.Concat(matrix), Rows);
+        }
+        public Matrix<T> JoinRows(Matrix<T> matrix){
+            if(Columns != matrix.Columns)
+                throw new ArgumentException("Matrix dimensions do not agree");
+            
+            Matrix<T> mat = new Matrix<T>(Rows + matrix.Rows, Columns);
+            for(int i = 0; i < Rows; i++)
+                for(int j = 0; j < Columns; j++)
+                    mat[i,j] = this[i,j];
+            
+            for(int i = 0; i < matrix.Rows; i++)
+                for(int j = 0; j < Columns; j++)
+                    mat[i + Rows, j] = matrix[i, j];
+            
+            return mat;
+        }
+
         /// <summary>
         ///     Copies the matrix into a new reference
         /// </summary>

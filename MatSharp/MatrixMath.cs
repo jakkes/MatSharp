@@ -1,9 +1,9 @@
 using System;
 
 namespace MatSharp {
-    public class MatrixMath{
-        public static MatrixObs Round(MatrixObs matrix, int decimals){
-            MatrixObs mat = new MatrixObs(matrix.Rows, matrix.Columns);
+    public static class MatrixMath{
+        public static Matrix<double> Round(this Matrix<double> matrix, int decimals){
+            Matrix<double> mat = new Matrix<double>(matrix.Rows, matrix.Columns);
 
             for(int i = 0; i < matrix.Rows; i++)
                 for(int j = 0; j < matrix.Columns; j++)
@@ -11,30 +11,35 @@ namespace MatSharp {
 
             return mat;
         }
-        public static MatrixObs Round(MatrixObs matrix)
+        public static Matrix<double> Round(this Matrix<double> matrix)
             => Round(matrix,0);
 
-        public static MatrixObs Pow(MatrixObs x, int y){
-            MatrixObs ret = x;
-            for(int i = 0; i < y; i++)
-                ret *= x;
-            return ret;
+        public static Matrix<double> Pow(this Matrix<double> x, int y){
+            if(x.Columns != x.Rows)
+                throw new ArgumentException("Invalid matrix dimensions");
+
+            if(y == 0)
+                return MatrixFactory.Identity(x.Columns);
+            else if(y == 1)
+                return x;
+            else
+                return x.Multiply(x.Pow(y - 1));
         }
 
         /// <summary>
         ///     Returns an approximation of e^A based on Taylor expansion of degree n
-        public static MatrixObs Exp(MatrixObs A, int n){
+        public static Matrix<double> Exp(this Matrix<double> A, int n){
             if(A.Rows != A.Columns)
                 throw new ArgumentException("Matrix dimensions do not agree");
 
-            MatrixObs curr = MatrixObs.Identity(A.Columns);
-            MatrixObs ret = curr;
+            Matrix<double> curr = MatrixFactory.Identity(A.Columns);
+            Matrix<double> ret = curr;
 
             int fac = 1;
             for(int i = 1; i < n; i++){
                 fac *= i;
-                curr *= A;
-                ret += 1 / fac * curr;
+                curr = curr.Multiply(A);
+                ret = ret.Add(curr.Multiply(1 / fac));
             }
 
             return ret;
