@@ -1,91 +1,73 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Collections;
-using System.Dynamic;
+using System.Collections.Generic;
 using System.Linq;
-using System.Globalization;
 
-namespace MatSharp
-{
-    public class Matrix : SuperMatrix<double>
+namespace MatSharp {
+    public class Matrix<T> : IEnumerable<T>
     {
-        public Matrix(int rows, int cols) : base(rows, cols)
-        {
-        }
-
-        public Matrix()
-        {
-        }
-
+        protected T[][] _matrix;
+        
         /// <summary>
-        ///     Returns the determinant
+        ///     Number of rows
         /// </summary>
-        public double Determinant
+        public int Rows
         {
             get
             {
-                return Matrix.Det(this);
+                return _matrix.Length;
             }
         }
         /// <summary>
-        ///     Returns the reduced row echolon form
+        ///     Number of columns
         /// </summary>
-        public Matrix Rref
+        public int Columns
         {
             get
             {
-                var mat = (Matrix) Clone();
+                return _matrix.Length == 0 ? 0 : _matrix[0].Length;
+            }
+        }
 
-                int row = 0;
-
-                for(int i = 0; i < Columns; i++){
-                    
-                    bool oneFixed = false;
-
-                    for(int j = row; j < Rows; j++){
-                        if(mat[j,i] != 0){
-                            mat.InterchangeRows(row,j);
-                            oneFixed = true;
-                            break;
-                        }
-                    }
-
-                    if(!oneFixed) continue;
-
-                    mat.MultiplyRow(row,1 / mat[row,i]);
-
-                    for(int j = 0; j < Rows; j++){
-                        if(j == row)
-                            continue;
-                        if(mat[j,i] == 0)
-                            continue;
-                        
-                        mat.AddRow(row,j,-1 * mat[j,i]);
-                    }
-
-                    row++;
-                }
+        public T this[int i, int j]{
+            get{
+                return _matrix[i][j];
+            } set {
+                _matrix[i][j] = value;
+            }
+        }
+        
+        /// <summary>
+        ///     Returns the transposed matrix
+        /// </summary>
+        public Matrix<T> Transpose {
+            get {
+                Matrix<T> mat = new Matrix<T>(Columns,Rows);
+                for(int i = 0; i < Rows; i++)
+                    for(int j = 0; j < Columns; j++)
+                        mat[j,i] = this[i,j];
 
                 return mat;
             }
         }
+
         /// <summary>
         ///     Copies the matrix into a new reference
         /// </summary>
-        public new Matrix Clone() => SubMatrix(Enumerable.Range(0, Rows), Enumerable.Range(0, Columns));
+        public Matrix<T> Clone() => SubMatrix(Enumerable.Range(0, Rows), Enumerable.Range(0, Columns));
         /// <summary>
         ///     Returns a submatrix
         /// </summary>
-        public new Matrix SubMatrix(int rowFrom, int rowCount, int colFrom, int colCount)
+        public Matrix<T> SubMatrix(int rowFrom, int rowCount, int colFrom, int colCount)
             => SubMatrix(Enumerable.Range(rowFrom, rowCount), Enumerable.Range(colFrom, colCount));
         /// <summary>
         ///     Returns a submatrix containing the rows and columns supplied.
         /// </summary>
-        public new Matrix SubMatrix(IEnumerable<int> rows, IEnumerable<int> cols)
+        public Matrix<T> SubMatrix(IEnumerable<int> rows, IEnumerable<int> cols)
         {
             int colCount = cols.Count();
             int rowCount = rows.Count();
-            Matrix mat = new Matrix(rowCount, colCount);
+            Matrix<T> mat = new Matrix<T>(rowCount, colCount);
             int i = 0;
             foreach (var row in rows)
             {
@@ -100,298 +82,101 @@ namespace MatSharp
             return mat;
         }
         /// <summary>
-        ///     Switches row1 and row2
+        ///     Returns a printable version of the matrix
         /// </summary>
-        private void InterchangeRows(int row1, int row2){
-            if(row1 == row2) return;
-
-            for (int i = 0; i < Columns; i++)
-            {
-                double temp = this[row1, i];
-                this[row1, i] = this[row2, i];
-                this[row2, i] = temp;
-            }
-        }
-        /// <summary>
-        ///     Replaces a row with a multiple of same row
-        /// </summary>
-        private void MultiplyRow(int row, double multiplier)
+        /// TODO: Make it prettier
+        public string toString()
         {
-            for (int i = 0; i < Columns; i++)
-                this[row, i] *= multiplier;
+            string str = "";
+            for (int i = 0; i < Rows; i++)
+            {
+                for (int j = 0; j < Columns; j++)
+                    str += this[i, j] + " ";
+
+                str += "\n";
+
+            }
+            return str;
         }
-        /// <summary>
-        ///     Adds one row to another
-        /// </summary>
-        private void AddRow(int row, int to) => AddRow(row, to, 1);
-        /// <summary>
-        ///     Adds a multiple of one row to another
-        /// </summary>
-        private void AddRow(int row, int to, double multiplier){
-            for (int i = 0; i < Columns; i++)
-                this[to, i] += multiplier * this[row, i];
-        }
-        /// <summary>
-        ///     Solves the equation Ax = b, where A is the current object
-        /// </summary>
-        /// TODO: Fix this
-        public Matrix Solve(Matrix b){
-            if(Rows != b.Rows)
-                throw new ArgumentException("Matrix dimensions do not agree");
-
-            var mat = JoinColumns(this, b);
-
-            var rref = mat.Rref;
-
-            if(rref.leadingElements.Any(x => x > Columns - 1))
-                throw new NoSolutionException("System cannot be solved.");
-
-            return (Matrix) rref.SubMatrix(0, Rows, Columns, b.Columns);
-        }
-        /// <summary>
-        ///     Returns the columns of the leading elements of each row. If there is no non-zero element, -1 is used
-        /// </summary>
-        private IEnumerable<int> leadingElements
+        public Matrix(int rows, int cols)
         {
-            get
-            {
-                int[] cols = new int[Rows];
-                for (int i = 0; i < Rows; i++)
-                {
-                    cols[i] = -1;
-                    for (int j = 0; j < Columns; j++)
-                    {
-                        if (this[i, j] != 0)
-                        {
-                            cols[i] = j;
-                            break;
-                        }
-                    }
-                }
-                return cols;
-            }
-        }
-
-        public static Matrix JoinRows(Matrix a, Matrix b){
-            if(a.Columns != b.Columns)
-                throw new ArgumentException("Matrix dimensions do not agree");
-
-            Matrix mat = new Matrix(a.Rows + b.Rows, a.Columns);
-
-            for(int i = 0; i < a.Rows; i++)
-                for(int j = 0; j < a.Columns; j++)
-                    mat[i,j] = a[i,j];
-                
-            for(int i = 0; i < b.Rows; i++)
-                for(int j = 0; j < b.Columns; j++)
-                    mat[a.Rows + i, j] = b[i ,j];
-
-            return mat;
-        }
-        public static Matrix JoinColumns(Matrix a, Matrix b){
-            if(a.Rows != b.Rows)
-                throw new ArgumentException("Matrix dimensions do not agree");
-
-            Matrix mat = new Matrix(a.Rows, a.Columns + b.Columns);
-
-            for(int i = 0; i < a.Rows; i++)
-                for(int j = 0; j < a.Columns; j++)
-                    mat[i,j] = a[i,j];
-                
-            for(int i = 0; i < b.Rows; i++)
-                for(int j = 0; j < b.Columns; j++)
-                    mat[i,a.Columns + j] = b[i ,j];
-
-            return mat;
-        }
-        public static double Det(Matrix a) => Det(a, Enumerable.Range(0, a.Columns), Enumerable.Range(0, a.Rows));
-        private static double Det(Matrix a, IEnumerable<int> cols, IEnumerable<int> rows){
-            int colCount = cols.Count();
-            int rowCount = rows.Count();
-            if (colCount != rowCount)
-                throw new ArgumentException("Matrix does not have same number of rows as columns.");
-            if (colCount == 1)
-                return a[rows.First(), cols.First()];
-            else
-            {
-                double det = 0;
-
-                int colIndex = 0;
-                foreach (var col in cols)
-                {
-                    det += a[rows.First(), col] * Det(a, cols.Where(x => x != col), rows.Skip(1)) * (colIndex % 2 == 0 ? 1 : -1);
-                    colIndex++;
-                }
-
-                return det;
-            }
-        }
-        public static Matrix Parse(string text) => Parse(text, ' ', ';');
-        public static Matrix Parse(string text, char colSep, char rowSep){
-
-            var rows = text.Split(rowSep);
-
-            Matrix mat = new Matrix();
-            mat._matrix = new double[rows.Length][];
-
-            var fmt = new NumberFormatInfo(){ NegativeSign = "-" };
-
-            for (int i = 0; i < rows.Length; i++)
-            {
-                var cols = rows[i].Split(colSep);
-
-                if (i > 0 && cols.Length != mat._matrix[i - 1].Length)
-                    throw new FormatException("Inconsistent matrix dimensions supplied");
-
-                mat._matrix[i] = new double[cols.Length];
-
-                for (int j = 0; j < cols.Length; j++)
-                    mat._matrix[i][j] = double.Parse(cols[j],fmt);
-            }
-
-            return mat;
-
-        }
-        public static Matrix Zeroes(int size) => Zeroes(size, size);
-        public static Matrix Zeroes(int rows, int cols)
-        {
-            Matrix mat = new Matrix(rows, cols);
+            _matrix = new T[rows][];
             for (int i = 0; i < rows; i++)
-                for (int j = 0; j < cols; j++)
-                    mat[i, j] = 0;
-
-            return mat;
+                _matrix[i] = new T[cols];
         }
-        public static Matrix Ones(int size) => Ones(size, size);
-        public static Matrix Ones(int rows, int cols)
-        {
-            Matrix mat = new Matrix(rows, cols);
-            for (int i = 0; i < rows; i++)
-                for (int j = 0; j < cols; j++)
-                    mat[i, j] = 1;
 
-            return mat;
-        }
-        public static Matrix Identity(int size)
-        {
-            var mat = new Matrix(size, size);
-            for (int i = 0; i < size; i++)
-            {
-                for (int j = 0; j < size; j++)
-                {
-                    if (i == j)
-                        mat[i, j] = 1;
+        /// <summary>
+        ///     Creates a matrix filled with data
+        /// </summary>
+        public Matrix(IEnumerable<T> data, int rows){
+            int dataCount = data.Count();
+            if(dataCount % rows != 0)
+                throw new ArgumentException("Cannot populate a matrix of " + rows + " with the given data.");
+            
+            int cols = dataCount / rows;
+            _matrix = new T[rows][];
+            for(int i = 0; i < rows; i++)
+                _matrix[i] = new T[cols];
+            
+            var e = data.GetEnumerator();
+            for(int i = 0; i < rows; i++){
+                for(int j = 0; j < rows; j++){
+                    if(e.MoveNext())
+                        _matrix[i][j] = e.Current;
                     else
-                        mat[i, j] = 0;
+                        throw new ArgumentException("Could not populate the matrix.");
                 }
             }
-            return mat;
         }
-        public static Matrix operator +(Matrix a, Matrix b)
+
+        public IEnumerator<T> GetEnumerator()
+            => new MatrixEnumerator<T>(this);
+
+        IEnumerator IEnumerable.GetEnumerator()
+            => GetEnumerator();
+
+        
+    }
+
+    public class MatrixEnumerator<T> : IEnumerator<T>
+    {
+        private Matrix<T> matrix;
+        private int row = -1;
+        private int col = 0;
+        public MatrixEnumerator(Matrix<T> mat)
         {
-            if (a.Rows != b.Rows || a.Columns != b.Columns)
-                throw new ArgumentException("Invalid matrix dimensions.");
-
-            Matrix mat = new Matrix(a.Rows, a.Columns);
-
-            for (int i = 0; i < mat.Rows; i++)
-                for (int j = 0; j < mat.Columns; j++)
-                    mat[i, j] = a[i, j] + b[i, j];
-
-            return mat;
+            matrix = mat;
         }
-        public static Matrix operator *(double a, Matrix b)
+
+        public T Current => matrix[row,col];
+
+        object IEnumerator.Current => matrix[row,col];
+
+        public void Dispose()
         {
-            Matrix mat = new Matrix(b.Rows, b.Columns);
-
-            for (int i = 0; i < mat.Rows; i++)
-                for (int j = 0; j < mat.Columns; j++)
-                    mat[i, j] = a * b[i, j];
-
-            return mat;
+            
         }
-        public static Matrix operator *(int a, Matrix b)
+
+        public bool MoveNext()
         {
-            Matrix mat = new Matrix(b.Rows, b.Columns);
-
-            for (int i = 0; i < mat.Rows; i++)
-                for (int j = 0; j < mat.Columns; j++)
-                    mat[i, j] = a * b[i, j];
-
-            return mat;
-        }
-        public static Matrix operator *(Matrix a, double b) => b * a;
-        public static Matrix operator *(Matrix a, int b) => b * a;
-        public static Matrix operator -(Matrix a, Matrix b)
-        {
-            if (a.Rows != b.Rows || a.Columns != b.Columns)
-                throw new ArgumentException("Invalid matrix dimensions.");
-
-            Matrix mat = new Matrix(a.Rows, a.Columns);
-
-            for (int i = 0; i < mat.Rows; i++)
-                for (int j = 0; j < mat.Columns; j++)
-                    mat[i, j] = a[i, j] - b[i, j];
-
-            return mat;
-        }
-        public static Matrix operator *(Matrix a, Matrix b)
-        {
-
-            if (a.Columns != b.Rows)
-                throw new ArgumentException("Invalid matrix dimensions.");
-
-            Matrix mat = new Matrix(b.Rows, b.Columns);
-
-            for (int i = 0; i < mat.Rows; i++)
-            {
-                for (int j = 0; j < mat.Columns; j++)
-                {
-                    mat[i, j] = 0;
-                    for (int k = 0; k < a.Columns; k++)
-                    {
-                        mat[i, j] += a[i, k] * b[k, j];
-                    }
+            if(row + 1 < matrix.Rows){
+                row++;
+                return true;
+            } else {
+                if(col + 1 < matrix.Columns){
+                    col++;
+                    row = 0;
+                    return true;
+                } else {
+                    return false;
                 }
             }
-
-            return mat;
         }
-        public static bool operator ==(Matrix a, Matrix b)
+
+        public void Reset()
         {
-            if (a.Rows != b.Rows || a.Columns != b.Columns)
-                return false;
-            for (int i = 0; i < a.Rows; i++)
-                for (int j = 0; j < a.Columns; j++)
-                    if (a[i, j] != b[i, j])
-                        return false;
-
-            return true;
+            col = 0;
+            row = -1;
         }
-        public static bool operator !=(Matrix a, Matrix b) => !(a == b);
-
-        public static bool operator <(Matrix a, Matrix b){
-            if(a.Rows != b.Rows || a.Columns != b.Columns)
-                throw new ArgumentException("Matrix dimensions do not agree.");
-
-            for(int i = 0; i < a.Rows; i++){
-                for(int j = 0; j < a.Columns; j++){
-                    if(a[i,j] > b[i,j])
-                        return false;
-                }
-            }
-
-            return true;
-        }
-        public static bool operator >(Matrix a, Matrix b) => b < a;
-
-        public override bool Equals(object obj)
-        {
-            if (obj is Matrix)
-                return this == (Matrix)obj;
-            return base.Equals(obj);
-        }
-
-        public override int GetHashCode() => base.GetHashCode();
     }
 }

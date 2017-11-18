@@ -2,8 +2,8 @@ using System;
 
 namespace MatSharp {
     public class MatrixMath{
-        public static Matrix Round(Matrix matrix, int decimals){
-            Matrix mat = new Matrix(matrix.Rows, matrix.Columns);
+        public static MatrixObs Round(MatrixObs matrix, int decimals){
+            MatrixObs mat = new MatrixObs(matrix.Rows, matrix.Columns);
 
             for(int i = 0; i < matrix.Rows; i++)
                 for(int j = 0; j < matrix.Columns; j++)
@@ -11,11 +11,11 @@ namespace MatSharp {
 
             return mat;
         }
-        public static Matrix Round(Matrix matrix)
+        public static MatrixObs Round(MatrixObs matrix)
             => Round(matrix,0);
 
-        public static Matrix Pow(Matrix x, int y){
-            Matrix ret = x;
+        public static MatrixObs Pow(MatrixObs x, int y){
+            MatrixObs ret = x;
             for(int i = 0; i < y; i++)
                 ret *= x;
             return ret;
@@ -23,12 +23,12 @@ namespace MatSharp {
 
         /// <summary>
         ///     Returns an approximation of e^A based on Taylor expansion of degree n
-        public static Matrix Exp(Matrix A, int n){
+        public static MatrixObs Exp(MatrixObs A, int n){
             if(A.Rows != A.Columns)
                 throw new ArgumentException("Matrix dimensions do not agree");
 
-            Matrix curr = Matrix.Identity(A.Columns);
-            Matrix ret = curr;
+            MatrixObs curr = MatrixObs.Identity(A.Columns);
+            MatrixObs ret = curr;
 
             int fac = 1;
             for(int i = 1; i < n; i++){
