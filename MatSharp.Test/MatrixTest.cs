@@ -10,13 +10,13 @@ namespace MatSharp.Test
         [Fact]
         public void Parser()
         {
-            MatrixObs mat = MatrixObs.Parse("1 2;3 4");
+            Matrix<double> mat = new Matrix<double>(new double[]{1,2,3,4},2);
             Assert.True(mat[0,0] == 1);
             Assert.True(mat[0,1] == 2);
             Assert.True(mat[1,0] == 3);
             Assert.True(mat[1,1] == 4);
 
-            MatrixObs mat2 = MatrixObs.Parse("1 2 -3;-4 5 6");
+            Matrix<double> mat2 = new Matrix<double>(new double[]{1,2,3,4,5,6},2);
             Assert.True(mat2[0,0] == 1);
             Assert.True(mat2[0,1] == 2);
             Assert.True(mat2[0,2] == -3);
@@ -24,7 +24,7 @@ namespace MatSharp.Test
             Assert.True(mat2[1,1] == 5);
             Assert.True(mat2[1,2] == 6);
 
-            Assert.Throws<FormatException>(() => MatrixObs.Parse("1 2 3;1 2 3 4"));
+            Assert.Throws<ArgumentException>(() => new Matrix<double>(new double[]{1,2,3,1,2,3,4},2));
 
         }
 

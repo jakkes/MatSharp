@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace MatSharp {
 
     public static class MatrixFactory{
@@ -28,6 +30,26 @@ namespace MatSharp {
         public static Matrix<double> Ones(int size)
             => Ones(size, size);
 
+        public static Matrix<double> Parse(string text, char rowSep, char colSep){
+            List<double> values = new List<double>();
+            
+            string str = "";
+            int rows = 0;
+
+            foreach(char c in text){
+                if(c == rowSep){
+                    values.Add(double.Parse(str.Trim()));
+                    rows++;
+                } else if(c == colSep){values.Add(double.Parse(str.Trim()));
+                    values.Add(double.Parse(str.Trim()));
+                } else {
+                    str += c;
+                }
+            }
+            values.Add(double.Parse(str.Trim()));
+
+            return new Matrix<double>(values, rows);
+        }
 
     }
 
