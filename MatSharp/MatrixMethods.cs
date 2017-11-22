@@ -119,69 +119,6 @@ namespace MatSharp {
             return mat;
         }
 
-        public static Matrix < bool > Equals(this Matrix < double > m, Matrix < double > matrix) {
-            if (m.Rows != matrix.Rows || m.Columns != matrix.Columns)
-                throw new ArgumentException("Invalid matrix dimensions.");
-
-            Matrix < bool > mat = new Matrix < bool > (m.Rows, m.Columns);
-
-            for (int i = 0; i < mat.Rows; i++)
-                for (int j = 0; j < mat.Columns; j++)
-                    mat[i, j] = m[i, j] == matrix[i, j];
-
-            return mat;
-        }
-
-        public static Matrix < bool > GreaterThan(this Matrix < double > m, Matrix < double > matrix) {
-            if (m.Rows != matrix.Rows || m.Columns != matrix.Columns)
-                throw new ArgumentException("Invalid matrix dimensions.");
-
-            Matrix < bool > mat = new Matrix < bool > (m.Rows, m.Columns);
-
-            for (int i = 0; i < mat.Rows; i++)
-                for (int j = 0; j < mat.Columns; j++)
-                    mat[i, j] = m[i, j] > matrix[i, j];
-
-            return mat;
-        }
-        public static Matrix < bool > GreaterEqual(this Matrix < double > m, Matrix < double > matrix) {
-            if (m.Rows != matrix.Rows || m.Columns != matrix.Columns)
-                throw new ArgumentException("Invalid matrix dimensions.");
-
-            Matrix < bool > mat = new Matrix < bool > (m.Rows, m.Columns);
-
-            for (int i = 0; i < mat.Rows; i++)
-                for (int j = 0; j < mat.Columns; j++)
-                    mat[i, j] = m[i, j] >= matrix[i, j];
-
-            return mat;
-        }
-
-        public static Matrix < bool > LessThan(this Matrix < double > m, Matrix < double > matrix) {
-            if (m.Rows != matrix.Rows || m.Columns != matrix.Columns)
-                throw new ArgumentException("Invalid matrix dimensions.");
-
-            Matrix < bool > mat = new Matrix < bool > (m.Rows, m.Columns);
-
-            for (int i = 0; i < mat.Rows; i++)
-                for (int j = 0; j < mat.Columns; j++)
-                    mat[i, j] = m[i, j] < matrix[i, j];
-
-            return mat;
-        }
-        public static Matrix < bool > LessEqual(this Matrix < double > m, Matrix < double > matrix) {
-            if (m.Rows != matrix.Rows || m.Columns != matrix.Columns)
-                throw new ArgumentException("Invalid matrix dimensions.");
-
-            Matrix < bool > mat = new Matrix < bool > (m.Rows, m.Columns);
-
-            for (int i = 0; i < mat.Rows; i++)
-                for (int j = 0; j < mat.Columns; j++)
-                    mat[i, j] = m[i, j] <= matrix[i, j];
-
-            return mat;
-        }
-
         /// <summary>
         ///     Solves the equation Ax = b, where A is the current object
         /// </summary>

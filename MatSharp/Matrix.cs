@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace MatSharp {
-    public class Matrix<T> : IEnumerable<T>
+    public class Matrix<T> : IEnumerable<T> where T : IComparable
     {
         protected T[][] _matrix;
         
@@ -156,6 +156,70 @@ namespace MatSharp {
             }
         }
 
+        public Matrix < bool > Equals(Matrix<T> matrix){
+            if (Rows != matrix.Rows || Columns != matrix.Columns)
+                throw new ArgumentException("Invalid matrix dimensions.");
+
+            Matrix < bool > mat = new Matrix < bool > (Rows, Columns);
+
+            for (int i = 0; i < mat.Rows; i++)
+                for (int j = 0; j < mat.Columns; j++)
+                    mat[i, j] = this[i, j].CompareTo(matrix[i, j]) == 0;
+
+            return mat;
+        }
+
+        public Matrix < bool > GreaterThan(Matrix < double > matrix) {
+            if (Rows != matrix.Rows || Columns != matrix.Columns)
+                throw new ArgumentException("Invalid matrix dimensions.");
+
+            Matrix < bool > mat = new Matrix < bool > (Rows, Columns);
+
+            for (int i = 0; i < mat.Rows; i++)
+                for (int j = 0; j < mat.Columns; j++)
+                    mat[i, j] = this[i, j].CompareTo(matrix[i, j]) > 0;
+
+            return mat;
+        }
+
+        public Matrix < bool > LessThan(Matrix < double > matrix) {
+            if (Rows != matrix.Rows || Columns != matrix.Columns)
+                throw new ArgumentException("Invalid matrix dimensions.");
+
+            Matrix < bool > mat = new Matrix < bool > (Rows, Columns);
+
+            for (int i = 0; i < mat.Rows; i++)
+                for (int j = 0; j < mat.Columns; j++)
+                    mat[i, j] = this[i, j].CompareTo(matrix[i, j]) < 0;
+
+            return mat;
+        }
+        
+        public Matrix < bool > LessEqual(Matrix < double > matrix) {
+            if (Rows != matrix.Rows || Columns != matrix.Columns)
+                throw new ArgumentException("Invalid matrix dimensions.");
+
+            Matrix < bool > mat = new Matrix < bool > (Rows, Columns);
+
+            for (int i = 0; i < mat.Rows; i++)
+                for (int j = 0; j < mat.Columns; j++)
+                    mat[i, j] = this[i, j].CompareTo(matrix[i, j]) <= 0;
+
+            return mat;
+        }
+
+        public Matrix < bool > GreaterEqual(Matrix < double > matrix) {
+            if (Rows != matrix.Rows || Columns != matrix.Columns)
+                throw new ArgumentException("Invalid matrix dimensions.");
+
+            Matrix < bool > mat = new Matrix < bool > (Rows, Columns);
+
+            for (int i = 0; i < mat.Rows; i++)
+                for (int j = 0; j < mat.Columns; j++)
+                    mat[i, j] = this[i, j].CompareTo(matrix[i, j]) >= 0;
+
+            return mat;
+        }
         public IEnumerator<T> GetEnumerator()
             => new MatrixEnumerator<T>(this);
 
@@ -165,7 +229,7 @@ namespace MatSharp {
         
     }
 
-    public class MatrixEnumerator<T> : IEnumerator<T>
+    public class MatrixEnumerator<T> : IEnumerator<T> where T : IComparable
     {
         private Matrix<T> matrix;
         private int row = -1;

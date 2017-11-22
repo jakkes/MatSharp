@@ -26,6 +26,8 @@ namespace MatSharp.Test
 
             Assert.Throws<ArgumentException>(() => new Matrix<double>(new double[]{1,2,3,1,2,3,4},2));
 
+            var mat3 = MatrixFactory.Parse("1 2;3 4");
+
         }
 
         [Fact]
@@ -34,12 +36,12 @@ namespace MatSharp.Test
             Matrix<double> b = new Matrix<double>(new double[]{1,2,3,4},2);
             Matrix<double> c = new Matrix<double>(new double[]{2,1,4,3},2);
             Matrix<double> d = new Matrix<double>(new double[]{1,2,3,4,5,6},2);
-            Assert.True(a == b);
-            Assert.False(a == c);
-            Assert.True(a != c);
 
-            Assert.True(a != d);
-            Assert.False(a == d);
+            Assert.True(a.Equals(b).All(x => x));
+            
+            Assert.False(a.Equals(c).All(x => x));
+
+            Assert.Throws<ArgumentException>(() => a.Equals(d));
         }
 
         [Fact]
