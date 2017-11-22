@@ -30,10 +30,10 @@ namespace MatSharp.Test
 
         [Fact]
         public void Equality(){
-            MatrixObs a = MatrixObs.Parse("1 2;3 4");
-            MatrixObs b = MatrixObs.Parse("1 2;3 4");
-            MatrixObs c = MatrixObs.Parse("2 1;4 3");
-            MatrixObs d = MatrixObs.Parse("1 2 3;1 2 3");
+            Matrix<double> a = new Matrix<double>(new double[]{1,2,3,4},2);
+            Matrix<double> b = new Matrix<double>(new double[]{1,2,3,4},2);
+            Matrix<double> c = new Matrix<double>(new double[]{2,1,4,3},2);
+            Matrix<double> d = new Matrix<double>(new double[]{1,2,3,4,5,6},2);
             Assert.True(a == b);
             Assert.False(a == c);
             Assert.True(a != c);
@@ -44,81 +44,81 @@ namespace MatSharp.Test
 
         [Fact]
         public void Determinant(){
-            MatrixObs mat = MatrixObs.Parse("1 2;3 4");
-            Assert.Equal(-2,mat.Determinant);
+            var mat = MatrixFactory.Parse("1 2;3 4");
+            Assert.Equal(-2,mat.Determinant());
 
-            MatrixObs mat2 = MatrixObs.Parse("4 3 2 1;9 8 7 6;12 21 12 43;97 1 32 1");
-            Assert.Equal(-19820, mat2.Determinant);
+            var mat2 = MatrixFactory.Parse("4 3 2 1;9 8 7 6;12 21 12 43;97 1 32 1");
+            Assert.Equal(-19820, mat2.Determinant());
         }
 
         [Fact]
         public void Adding(){
-            MatrixObs m1 = MatrixObs.Parse("1 2;3 4");
-            MatrixObs m2 = MatrixObs.Parse("-1 -2;-3 -4");
-            MatrixObs m3 = MatrixObs.Parse("0 0;0 0");
-            Assert.Equal(m3, m1 + m2);
+            var m1 = MatrixFactory.Parse("1 2;3 4");
+            var m2 = MatrixFactory.Parse("-1 -2;-3 -4");
+            var m3 = MatrixFactory.Parse("0 0;0 0");
+            Assert.Equal(m3, m1.Add(m2));
         }
 
         [Fact]
         public void MultiplyScalar(){
-            MatrixObs m1 = MatrixObs.Parse("1 2;3 4");
-            MatrixObs m2 = MatrixObs.Parse("-1 -2;-3 -4");
-            Assert.Equal(m2, -1 * m1);
+            var m1 = MatrixFactory.Parse("1 2;3 4");
+            var m2 = MatrixFactory.Parse("-1 -2;-3 -4");
+            Assert.Equal(m2, m1.Multiply(-1));
         }
 
         [Fact]
         public void OnesZeros(){
             Assert.Equal(
-                MatrixObs.Parse("1 1 1;1 1 1"), MatrixObs.Ones(2,3)
+                MatrixFactory.Parse("1 1 1;1 1 1"), MatrixFactory.Ones(2,3)
             );
-            Assert.Equal(MatrixObs.Zeroes(4), MatrixObs.Ones(4) - MatrixObs.Ones(4));
+            Assert.Equal(MatrixFactory.Zeroes(4), MatrixFactory.Ones(4).Subtract(MatrixFactory.Ones(4)));
         }
 
         [Fact]
         public void Identity(){
             Assert.Equal(
-                MatrixObs.Parse("1 0 0;0 1 0;0 0 1"),
-                MatrixObs.Identity(3)
+                MatrixFactory.Parse("1 0 0;0 1 0;0 0 1"),
+                MatrixFactory.Identity(3)
             );
         }
 
         [Fact]
         public void MultiplyMatrices(){
-            MatrixObs mat = MatrixObs.Parse("4 5 2;0 9 1;3 1 2");
-            Assert.Equal(mat, MatrixObs.Identity(3) * mat);
+            var mat = MatrixFactory.Parse("4 5 2;0 9 1;3 1 2");
+            Assert.Equal(mat, MatrixFactory.Identity(3).Multiply(mat));
 
-            MatrixObs mat2 = MatrixObs.Parse("3 1 4 5 6;1 2 3 4 5;9 8 7 6 5");
-            MatrixObs mat3 = MatrixObs.Parse("35 30 45 52 59;18 26 34 42 50;28 21 29 31 33");
+            var mat2 = MatrixFactory.Parse("3 1 4 5 6;1 2 3 4 5;9 8 7 6 5");
+            var mat3 = MatrixFactory.Parse("35 30 45 52 59;18 26 34 42 50;28 21 29 31 33");
 
-            Assert.Equal(mat3, mat * mat2);
-            Assert.Throws<ArgumentException>(() => mat2 * mat);
+            Assert.Equal(mat3, mat.Multiply(mat2));
+            Assert.Throws<ArgumentException>(() => mat2.Multiply(mat));        
         }
 
         [Fact]
         public void Rref(){
             Assert.Equal(
-                MatrixObs.Identity(2), 
-                MatrixObs.Parse("1 1;-1 1").Rref
+                MatrixFactory.Identity(2), 
+                MatrixFactory.Parse("1 1;-1 1").RREF()
             );
 
             Assert.Equal(
-                MatrixObs.Parse("1 1;0 0"),
-                MatrixObs.Parse("1 1;1 1").Rref
+                MatrixFactory.Parse("1 1;0 0"),
+                MatrixFactory.Parse("1 1;1 1").RREF()
             );
 
             Assert.Equal(
-                MatrixObs.Parse("1 0 5 0 0 0;0 1 0 0 1 3;0 0 0 1 -1 -3"),
-                MatrixObs.Parse("-1 2 -5 1 1 3;1 0 5 -1 1 3;1 0 5 1 -1 -3").Rref
+                MatrixFactory.Parse("1 0 5 0 0 0;0 1 0 0 1 3;0 0 0 1 -1 -3"),
+                MatrixFactory.Parse("-1 2 -5 1 1 3;1 0 5 -1 1 3;1 0 5 1 -1 -3").RREF()
             );
         }
 
         [Fact]
         public void JoinRows(){
             Assert.Equal(
-                MatrixObs.Parse("1 2;3 4;5 6;7 8"),
-                MatrixObs.JoinRows(
-                    MatrixObs.Parse("1 2;3 4"),
-                    MatrixObs.Parse("5 6;7 8")
+                MatrixFactory.Parse("1 2;3 4;5 6;7 8"),
+                Matrix<double>.JoinRows(
+                    MatrixFactory.Parse("1 2;3 4"),
+                    MatrixFactory.Parse("5 6;7 8")
                 )
             );
         }
@@ -126,10 +126,10 @@ namespace MatSharp.Test
         [Fact]
         public void JoinColumns(){
             Assert.Equal(
-                MatrixObs.Parse("1 2 3 4;5 6 7 8"),
-                MatrixObs.JoinColumns(
-                    MatrixObs.Parse("1 2;5 6"),
-                    MatrixObs.Parse("3 4;7 8")
+                MatrixFactory.Parse("1 2 3 4;5 6 7 8"),
+                Matrix<double>.JoinColumns(
+                    MatrixFactory.Parse("1 2;5 6"),
+                    MatrixFactory.Parse("3 4;7 8")
                 )
             );
         }
@@ -137,24 +137,24 @@ namespace MatSharp.Test
         [Fact]
         public void Transpose(){
             Assert.Equal(
-                MatrixObs.Parse("1 2 3;4 5 6"),
-                MatrixObs.Parse("1 4;2 5;3 6").Transpose
+                MatrixFactory.Parse("1 2 3;4 5 6"),
+                MatrixFactory.Parse("1 4;2 5;3 6").GetTranspose()
             );
         }
 
         [Fact]
         public void Solve(){
             Assert.Equal(
-                MatrixObs.Parse("1;1"),
-                MatrixObs.Parse("1 0;0 1").Solve(MatrixObs.Parse("1;1"))
+                MatrixFactory.Parse("1;1"),
+                MatrixFactory.Parse("1 0;0 1").Solve(MatrixFactory.Parse("1;1"))
             );
 
-            var x = MatrixObs.Parse("2 1;1 2");
-            var A = MatrixObs.Parse("3 1;1 3");
-            var b = MatrixObs.Parse("7 5;5 7");
+            var x = MatrixFactory.Parse("2 1;1 2");
+            var A = MatrixFactory.Parse("3 1;1 3");
+            var b = MatrixFactory.Parse("7 5;5 7");
 
             Assert.Equal(
-                b, A*x
+                b, A.Multiply(x)
             );
 
             Assert.Equal(
@@ -165,7 +165,7 @@ namespace MatSharp.Test
 
         [Fact]
         public void Enumerator(){
-            MatrixObs a = MatrixObs.Parse("1 2;3 4;5 6");
+            var a = MatrixFactory.Parse("1 2;3 4;5 6");
             Assert.Equal(1, a.ElementAt(0));
             Assert.Equal(3, a.ElementAt(1));
             Assert.Equal(5, a.ElementAt(2));

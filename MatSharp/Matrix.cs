@@ -36,19 +36,18 @@ namespace MatSharp {
                 _matrix[i][j] = value;
             }
         }
-        
+
         /// <summary>
         ///     Returns the transposed matrix
         /// </summary>
-        public Matrix<T> Transpose {
-            get {
-                Matrix<T> mat = new Matrix<T>(Columns,Rows);
-                for(int i = 0; i < Rows; i++)
-                    for(int j = 0; j < Columns; j++)
-                        mat[j,i] = this[i,j];
+        public Matrix<T> GetTranspose()
+        {
+            Matrix<T> mat = new Matrix<T>(Columns, Rows);
+            for (int i = 0; i < Rows; i++)
+                for (int j = 0; j < Columns; j++)
+                    mat[j, i] = this[i, j];
 
-                return mat;
-            }
+            return mat;
         }
 
         public Matrix<T> JoinColumns(Matrix<T> matrix){
@@ -72,6 +71,12 @@ namespace MatSharp {
             
             return mat;
         }
+
+        public static Matrix<T> JoinRows(Matrix<T> a, Matrix<T> b)
+            => a.JoinRows(b);
+
+        public static Matrix<T> JoinColumns(Matrix<T> a, Matrix<T> b)
+            => a.JoinColumns(b);
 
         /// <summary>
         ///     Copies the matrix into a new reference

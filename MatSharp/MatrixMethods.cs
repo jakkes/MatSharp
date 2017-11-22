@@ -81,6 +81,8 @@ namespace MatSharp {
                 matrix[to, i] += multiplier * matrix[row, i];
         }
 
+        public static Matrix<double> Subtract(this Matrix<double> m, Matrix<double> matrix)
+            => m.Add(matrix,-1);
         public static Matrix < double > Add(this Matrix < double > m, Matrix < double > matrix) => m.Add(matrix, 1);
         public static Matrix < double > Add(this Matrix < double > m, Matrix < double > matrix, double multiplier) {
             if (m.Rows != matrix.Rows || m.Columns != matrix.Columns)

@@ -30,6 +30,8 @@ namespace MatSharp {
         public static Matrix<double> Ones(int size)
             => Ones(size, size);
 
+        public static Matrix<double> Parse(string text)
+            => Parse(text, ';',' ');
         public static Matrix<double> Parse(string text, char rowSep, char colSep){
             List<double> values = new List<double>();
             
@@ -50,7 +52,5 @@ namespace MatSharp {
 
             return new Matrix<double>(values, rows);
         }
-
     }
-
 }
