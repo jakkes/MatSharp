@@ -11,17 +11,17 @@ namespace MatSharp.Test
         public void Parser()
         {
             Matrix<double> mat = new Matrix<double>(new double[]{1,2,3,4},2);
-            Assert.True(mat[0,0] == 1);
-            Assert.True(mat[0,1] == 2);
-            Assert.True(mat[1,0] == 3);
-            Assert.True(mat[1,1] == 4);
+            Assert.Equal(1, mat[0,0]);
+            Assert.Equal(2, mat[1,0]);
+            Assert.Equal(3, mat[0,1]);
+            Assert.Equal(4, mat[1,1]);
 
-            Matrix<double> mat2 = new Matrix<double>(new double[]{1,2,3,4,5,6},2);
+            Matrix<double> mat2 = new Matrix<double>(new double[]{1,2,-3,-4,5,6},2);
             Assert.True(mat2[0,0] == 1);
-            Assert.True(mat2[0,1] == 2);
-            Assert.True(mat2[0,2] == -3);
-            Assert.True(mat2[1,0] == -4);
-            Assert.True(mat2[1,1] == 5);
+            Assert.True(mat2[1,0] == 2);
+            Assert.True(mat2[0,1] == -3);
+            Assert.True(mat2[1,1] == -4);
+            Assert.True(mat2[0,2] == 5);
             Assert.True(mat2[1,2] == 6);
 
             Assert.Throws<ArgumentException>(() => new Matrix<double>(new double[]{1,2,3,1,2,3,4},2));

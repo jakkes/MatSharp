@@ -146,10 +146,10 @@ namespace MatSharp {
                 _matrix[i] = new T[cols];
             
             var e = data.GetEnumerator();
-            for(int i = 0; i < rows; i++){
+            for(int i = 0; i < cols; i++){
                 for(int j = 0; j < rows; j++){
                     if(e.MoveNext())
-                        _matrix[i][j] = e.Current;
+                        _matrix[j][i] = e.Current;
                     else
                         throw new ArgumentException("Could not populate the matrix.");
                 }
