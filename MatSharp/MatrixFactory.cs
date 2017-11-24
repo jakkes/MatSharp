@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace MatSharp {
 
@@ -36,21 +38,26 @@ namespace MatSharp {
             List<double> values = new List<double>();
             
             string str = "";
-            int rows = 0;
+            int cols = 0;
+            int pcols = -1
 
             foreach(char c in text){
                 if(c == rowSep){
-                    values.Add(double.Parse(str.Trim()));
-                    rows++;
-                } else if(c == colSep){values.Add(double.Parse(str.Trim()));
-                    values.Add(double.Parse(str.Trim()));
+                    values.Add(double.Parse(str.ToString().Trim()));
+                    str = "";
+                    if (pcols != -1 && cols != pcols)
+                        throw new ArgumentException();
+                } else if(c == colSep){
+                    values.Add(double.Parse(str.ToString().Trim()));
+                    str = "";
+                    cols++;
                 } else {
                     str += c;
                 }
             }
-            values.Add(double.Parse(str.Trim()));
+            values.Add(double.Parse(str.ToString().Trim()));
 
-            return new Matrix<double>(values, rows);
+            return new Matrix<double>(values, cols).GetTranspose();
         }
     }
 }

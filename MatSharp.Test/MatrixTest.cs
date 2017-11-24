@@ -27,6 +27,10 @@ namespace MatSharp.Test
             Assert.Throws<ArgumentException>(() => new Matrix<double>(new double[]{1,2,3,1,2,3,4},2));
 
             var mat3 = MatrixFactory.Parse("1 2;3 4");
+            Assert.Equal(1, mat3[0,0]);
+            Assert.Equal(2, mat3[0,1]);
+            Assert.Equal(3, mat3[1,0]);
+            Assert.Equal(4, mat3[1,1]);
 
         }
 
