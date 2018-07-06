@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MatSharp {
 
-    public static class MatrixFactory{
+    public static class MatrixFactory {
 
         public static Matrix<double> Identity(int size){
             var mat = new Matrix<double>(size,size);
@@ -39,7 +39,7 @@ namespace MatSharp {
             
             string str = "";
             int cols = 0;
-            int pcols = -1
+            int pcols = -1;
 
             foreach(char c in text){
                 if(c == rowSep){
